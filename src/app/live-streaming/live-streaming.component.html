@@ -1,3 +1,14 @@
-<p>
-  live-streaming works!
-</p>
+<!-- <div class="row">
+  <image src="./assets/img/plane.jpg"></image>
+</div> -->
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      {{plotFlag}}
+      <div class="col-md-12" *ngIf="plotFlag">
+        <lbd-chart [title]="'Live Data'" [subtitle]="'Aircraft Prediction'" [chartType]="RULChartType" [chartData]="RULChartData"
+          [chartOptions]="RULChartOptions" [legendItems]="RULChartLegendItems" [withHr]="true"></lbd-chart>
+      </div>
+    </div>
+  </div>
+</div>

@@ -32,6 +32,12 @@ import { TroposAlertComponent } from 'app/tropos.tools/tropos.alert/tropos.alert
 import { TroposAlertService } from 'app/common/services/tropos.alert.service';
 import { LiveStreamingComponent } from './live-streaming/live-streaming.component';
 
+// export function highchartsFactory() {
+
+//   return require('highcharts');
+  
+//   }
+
 @NgModule({
   declarations: [
     AppComponent,
