@@ -12,8 +12,8 @@ from flask import flash, redirect,jsonify, stream_with_context, Response
 
 from flask_api import status
 
-from binary.binary_classification import BinaryClassification
-from ml.lk_regression1 import MLPredictions
+from server.binary.binary_classification import BinaryClassification
+from server.ml.lk_regression1 import MLPredictions
 
 import os, time
 
@@ -56,14 +56,10 @@ def get_image(key):
     return send_file(generated_graphs[key],mimetype='image/png')
 
 
-@app.route("/ml/live_stream")
-def get_live_stream():
-    def generate():
-        
-            while True:
-                
-            
-    return Response(stream_with_context(generate()))
+#@app.route("/ml/live_stream")
+#def get_live_stream():
+#    def generate():
+#    return Response(stream_with_context(generate()))
 
 @app.route("/binary/train", methods = ['POST'])
 def start_training():
