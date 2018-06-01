@@ -1,0 +1,138 @@
+<div *ngIf="!graphData" class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Data</h4>
+                    </div>
+                    <div class="content">
+                        <form>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label>Choose Test Data</label>
+                                    <div class="form-group">
+                                       
+                                        <div class="col-md-7">
+                                            <input #fileInput type="file" name="jsonData" id="test">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <button type="submit" class="button button-primary">Browse</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                    <div class="col-xs-12">
+                                            <label>Choose Train Data</label>
+                                        <div class="form-group">
+                                            
+                                            <div class="col-md-7">
+                                                <input #fileInput1 type="file" name="jsonData" id="train">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <button type="submit" class="button button-primary">Browse</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                        <div class="col-xs-12">
+                                                <label>Choose Truth Data</label>
+                                            <div class="form-group">
+                                                
+                                                <div class="col-md-7">
+                                                    <input #fileInput2 type="file" name="jsonData" id="truth" >
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <button type="submit" class="button button-primary">Browse</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                            <div class="col-xs-12">                                            
+                                                <div class="form-group">
+                                                    <div class="col-md-5">
+                                                        <button type="submit" class="btn btn-info btn-fill" (click)="fileUpload()" style="float:right">Upload</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label>Select the Algorithm</label>
+                                        <select name="algo" class="form-control">
+                                            <option value="regression">Regression</option>
+                                            <option value="binary">Binary</option>
+                                            <option value="both">Both</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">                  
+                            <button type="submit" class="btn btn-info btn-fill" (click)="trainData()" style="float:right;margin-right:250px">Train</button>
+                            <button type="submit" class="btn btn-info btn-fill" (click)="testData()" style="float:right;margin-right:-150px">Test</button>                     
+                            </div>
+                            <div class="clearfix"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<div *ngIf="graphData" class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+                <div class="col-md-12" *ngIf="graphFlag">
+                        <lbd-chart
+                          [title]="'Truth Data'"
+                          [subtitle]="'Aircraft Prediction'"
+                          [chartType]="RULChartType"
+                          [chartData]="RULChartData"
+                          [chartOptions]="RULChartOptions"                 
+                          [legendItems]="RULChartLegendItems"
+                          [withHr]="true"
+                          ></lbd-chart>
+            
+                    </div>     
+        </div>
+        <div class="row">
+            <div class="col-md-8" *ngIf="graphFlag">
+                <lbd-chart
+                  [title]="'Regression Comparitive study'"
+                  [subtitle]="'Prediction vs Actual'"
+                  [chartType]="activityChartType"
+                  [chartData]="activityChartData"
+                  [chartOptions]="activityChartOptions"
+              
+                  [legendItems]="activityChartLegendItems"
+                  [withHr]="true"
+                  ></lbd-chart>
+            </div>   
+            
+            <div class="col-md-4"  *ngIf="graphFlag">
+                <lbd-chart
+                  [title]="'Accuracy of Regression'"
+                  [subtitle]="'Binary'"
+                  [chartClass]="'ct-perfect-fourth'"
+                  [chartType]="emailChartType"
+                  [chartData]="emailChartData"
+                  [legendItems]="emailChartLegendItems"
+                  [withHr]="true"
+                  ></lbd-chart>      
+            </div>  
+        </div>
+    </div>
+</div>
+
