@@ -60,8 +60,10 @@ def get_image(key):
 @app.route("/ml/live_stream")
 def get_live_stream():
     def generate():
-        ls = Live_Streaming(50)    
-        yield(ls.start_streaming(30,15))
+        while True:
+            yield("hello")
+        #ls = Live_Streaming(50)    
+        #yield(ls.start_streaming(30,15))
     return Response(stream_with_context(generate()))
 
 @app.route("/binary/train", methods = ['POST'])
@@ -157,6 +159,7 @@ def upload_func():
                 if os.path.isfile(file_path):
                     os.unlink(file_path)
             except Exception as e:
+                print(e)
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
 
         return 200

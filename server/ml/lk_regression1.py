@@ -43,8 +43,8 @@ class MLPredictions:
     def __init__(self,algo_name,approach,w1,w0):
         self.algoName = algo_name
         self.approach = approach    
-        self.general_data_processing(w1,w0)    
-        self.data_processing_regression()
+        self.w1 = w1
+        self.w0 = w0
     
 
     def general_data_processing(self,w1,w0):
@@ -370,10 +370,41 @@ class MLPredictions:
         plt.title(aName)
         #plt.show()
         return df_solution      
+
+
+
+
+    def test_stream_data(self,aName, cleanApproach,test_dataframe):
+        if cleanApproach == "PCA":
+            print("Cleaning Approach is PCA - Test Data")
+            test_dataframe = test_dataframe.drop(['id','cycle','id','s7','s8','s9','s11', 's12','s13','s14','s15','s17','s20','s21'], axis=1)
+            X_test = test_dataframe
+        elif cleanApproach == "treeClasifier":
+            print("Cleaning Approach is treeClasifier - Test Data")
+            X_test = test_dataframe
+        else:
+            print("Invalid Clean approach")
+            
+        df_solution = pd.DataFrame()
+        
+        print("called test_model")
+        # Starting time for time calculations
+        start_time = time.time()
+        
+        predictions = self.algo_instant.predict(X_test)
+        # predictions_day = algo_instant.predict(X_Day_TEST)
+        print("The time taken to execute is %s seconds" % (time.time() - start_time))
+    
+        # Prepare Solution dataframe    
+        df_solution['Engine_ID'] = test_dataframe.id
+        df_solution['Predicted_RUL'] = predictions
+    
+        return df_solution      
     
     
     def start_model_training(self):
-        
+        self.general_data_processing(self.w1,self.w0)    
+        self.data_processing_regression()
         try:
             if self.approach is 'PCA':    
                 self.calculate_feature_ranking_PCA()
@@ -393,6 +424,10 @@ class MLPredictions:
         
         
     def start_model_testing(self):
+
+        self.general_data_processing(self.w1,self.w0)    
+        self.data_processing_regression()
+
         try:
             if self.approach is PCA:    
                 self.calculate_feature_ranking_PCA()
@@ -413,6 +448,41 @@ class MLPredictions:
             with open(jsonName, 'w') as outfile:
                 json.dump(jsonObject, outfile)
             
+            return jsonObject
+            
+        except:
+            traceback.print_exc()    
+        
+        return None
+
+
+    def preprocess_data_frame_stream(self,tf_dataframe):
+        tf_dataframe.drop(self.tf_dataframe.columns[[26, 27]], axis=1, inplace=True)
+        tf_dataframe.columns = ['id', 'cycle', 'setting1', 'setting2', 'setting3', 's1', 's2', 's3',
+                             's4', 's5', 's6', 's7', 's8', 's9', 's10', 's11', 's12', 's13', 's14',
+                             's15', 's16', 's17', 's18', 's19', 's20', 's21']
+
+
+        tf_dataframe['cycle_norm'] = tf_dataframe['cycle']
+        norm_test_df = pd.DataFrame(min_max_scaler.transform(self.tf_dataframe[cols_normalize]), 
+                                    columns=cols_normalize, 
+                                    index=tf_dataframe.index)
+        test_join_df = tf_dataframe[self.tf_dataframe.columns.difference(cols_normalize)].join(norm_test_df)
+        tf_dataframe = test_join_df.reindex(columns = self.test_df.columns)
+        tf_dataframe = tf_dataframe.reset_index(drop=True)
+        tf_dataframe = tf_dataframe.drop(['setting3', 's1', 's5', 's10', 's16', 's18', 's19'], axis=1)
+        tf_dataframe = tf_dataframe.drop(['RUL','label1', 'label2'], axis=1)
+
+
+    def start_testing_on_stream(self,tf_dataframe):
+        process_tf_dataframe = self.preprocess_data_frame_stream(self,tf_dataframe)
+
+        try:  
+            self.train_regression_model(self.algoName, self.approach)        
+            df_solution = self.test_stream_data(self.algoName, self.approach,)        
+            jsonObject = {}            
+            jsonObject["engine_id"] = df_solution['Engine_ID'].values.tolist()
+            jsonObject["predicted_rul"] = df_solution['Predicted_RUL'].values.tolist()    
             return jsonObject
             
         except:
