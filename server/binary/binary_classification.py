@@ -37,7 +37,7 @@ class BinaryClassification:
     # pick a large window size of 50 cycles
     sequence_length = 25
     
-    #local model path 
+    #local model path
     model_path = './server/Output/binary_model.h5'
          
         
@@ -216,7 +216,6 @@ class BinaryClassification:
         
         try:
             
-            
             self.startTraining(w1,w0,2)
             
             # read ground truth data - It contains the information of true remaining cycles for each engine in the testing data.
@@ -326,7 +325,7 @@ class BinaryClassification:
             # if best iteration's model was saved then load and use it
             
             #print (BinaryClassification.model_path)
-            if os.path.isfile(BinaryClassification.model_path):                
+            if os.path.isfile(BinaryClassification.model_path):
                     estimator = load_model(BinaryClassification.model_path)
             
             # test metrics
@@ -334,7 +333,7 @@ class BinaryClassification:
             #print('Accurracy: {}'.format(scores_test[1]))
             
             # make predictions and compute confusion matrix
-            print('using estimater')
+            
             y_pred_test = estimator.predict_classes(seq_array_test_last)
             y_true_test = label_array_test_last
             
@@ -373,7 +372,7 @@ class BinaryClassification:
             new_list = list()
             rows = len(y_pred_test)
             for i in range(rows):
-                new_list.append(y_pred_test[i][0])
+                new_list.append(np.asscalar(y_pred_test[i][0]))
 
             
             response_data["engine_id"] =  test_df.groupby('id')['id'].nth(-1)[y_mask].values.tolist()
