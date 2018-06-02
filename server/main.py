@@ -61,12 +61,14 @@ def get_image(key):
 def get_live_stream():
     
     def generate():
-        wait_time = 1
+        wait_time = 3
         index = 1
         while True:
             ls = Live_Streaming(10000)    
-            print(ls.start_streaming(30,15,index))
-            #yield(jsonify(ls.start_streaming(30,15,index)))
+            #print(ls.start_streaming(30,15,index))
+            json_obj = ls.start_streaming(30,15,index)
+            json_obj['timestamp'] = time.time()
+            yield(jsonify(json_obj))
             time.sleep(wait_time)
             index = index + 1
     return Response(stream_with_context(generate()))
