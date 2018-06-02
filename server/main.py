@@ -59,11 +59,16 @@ def get_image(key):
 
 @app.route("/ml/live_stream")
 def get_live_stream():
+    
     def generate():
+        wait_time = 1
+        index = 1
         while True:
-            yield("hello")
-        #ls = Live_Streaming(50)    
-        #yield(ls.start_streaming(30,15))
+            ls = Live_Streaming(10000)    
+            print(ls.start_streaming(30,15,index))
+            #yield(jsonify(ls.start_streaming(30,15,index)))
+            time.sleep(wait_time)
+            index = index + 1
     return Response(stream_with_context(generate()))
 
 @app.route("/binary/train", methods = ['POST'])

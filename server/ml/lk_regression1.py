@@ -97,8 +97,8 @@ class MLPredictions:
         # MinMax normalization (from 0 to 1)
         self.train_df['cycle_norm'] = self.train_df['cycle']
         cols_normalize = self.train_df.columns.difference(['id','cycle','RUL','label1','label2'])
-        min_max_scaler = preprocessing.MinMaxScaler()
-        norm_train_df = pd.DataFrame(min_max_scaler.fit_transform(self.train_df[cols_normalize]), 
+        self.min_max_scaler = preprocessing.MinMaxScaler()
+        norm_train_df = pd.DataFrame(self.min_max_scaler.fit_transform(self.train_df[cols_normalize]), 
                                      columns=cols_normalize, 
                                      index=self.train_df.index)
         join_df = self.train_df[self.train_df.columns.difference(cols_normalize)].join(norm_train_df)
@@ -112,7 +112,7 @@ class MLPredictions:
         ######
         # MinMax normalization (from 0 to 1)
         self.test_df['cycle_norm'] = self.test_df['cycle']
-        norm_test_df = pd.DataFrame(min_max_scaler.transform(self.test_df[cols_normalize]), 
+        norm_test_df = pd.DataFrame(self.min_max_scaler.transform(self.test_df[cols_normalize]), 
                                     columns=cols_normalize, 
                                     index=self.test_df.index)
         test_join_df = self.test_df[self.test_df.columns.difference(cols_normalize)].join(norm_test_df)
@@ -124,7 +124,7 @@ class MLPredictions:
         # Using ground truth dataset to generate labels for the test data.
         # generate column max for test data
         rul = pd.DataFrame(self.test_df.groupby('id')['cycle'].max()).reset_index()
-        print(rul)
+        #print(rul)
         rul.columns = ['id', 'max']
         self.truth_df.columns = ['more']
         self.truth_df['id'] = self.truth_df.index + 1
@@ -175,8 +175,8 @@ class MLPredictions:
         fit = pca.fit(X, y)
         # summarize components
         #print("Explained Variance: %s") % fit.explained_variance_ratio_
-        print(fit.components_)
-        print(pca.explained_variance_ratio_)
+        #print(fit.components_)
+        #print(pca.explained_variance_ratio_)
         
         
         #importances = fit.explained_variance_ratio_
@@ -187,10 +187,10 @@ class MLPredictions:
         indices = np.argsort(importances)[::-1]
         
         # Print the feature ranking
-        print("Feature ranking:")
+        #print("Feature ranking:")
     
-        for feat in range(X.shape[1]):
-            print("feature %d : %s (%f)" % (indices[feat], sorted_features[feat][0], sorted_features[feat][1]))
+        #for feat in range(X.shape[1]):
+            #print("feature %d : %s (%f)" % (indices[feat], sorted_features[feat][0], sorted_features[feat][1]))
     
         # Plot the feature importances of the forest
         plt.figure(0)
@@ -224,10 +224,10 @@ class MLPredictions:
         indices = np.argsort(importances)[::-1]
         
         # Print the feature ranking
-        print("Feature ranking:")
+        #print("Feature ranking:")
     
-        for feat in range(X.shape[1]):
-            print("feature %d : %s (%f)" % (indices[feat], sorted_features[feat][0], sorted_features[feat][1]))
+        #for feat in range(X.shape[1]):
+        #    print("feature %d : %s (%f)" % (indices[feat], sorted_features[feat][0], sorted_features[feat][1]))
     
         # Plot the feature importances of the forest
         plt.figure(0)
@@ -258,24 +258,21 @@ class MLPredictions:
         #Removing S6 from training set since its not ranked by extraTreeClasifier.
     
         if cleanApproach == "PCA":
-            print("Cleaning Approach is PCA - Train data")
+            #print("Cleaning Approach is PCA - Train data")
             df_train_features = self.reg_train_df.drop(['cycle','RUL','id','s7','s8','s9','s11', 's12','s13','s14','s15','s17','s20','s21'], axis=1)
             
         elif cleanApproach == "treeClasifier":
-            print("Cleaning Approach is treeClasifier - Train Data")
+            #print("Cleaning Approach is treeClasifier - Train Data")
             df_train_features = self.reg_train_df.drop(['RUL'], axis=1)
         else:
             print("Invalid Clean approach")
         #df_train_features = reg_train_df
         # store features in X array
         X = df_train_features.values
-        print(df_train_features.values)
         # store target in y array
         y = self.reg_train_df['RUL'].values
-        print(y)
         # Create decision tree object
         # clf = DecisionTreeRegressor()
-    
         self.train_model(algoName, X, y )
         
         
@@ -311,12 +308,12 @@ class MLPredictions:
     def test_model(self,aName, cleanApproach):
         #reg_test_df1 =""
         if cleanApproach == "PCA":
-            print("Cleaning Approach is PCA - Test Data")
+            #print("Cleaning Approach is PCA - Test Data")
             reg_test_df1 = self.reg_test_df.drop(['id','cycle','id','s7','s8','s9','s11', 's12','s13','s14','s15','s17','s20','s21'], axis=1)
             X_test = reg_test_df1
-            print(reg_test_df1)
+            #print(reg_test_df1)
         elif cleanApproach == "treeClasifier":
-            print("Cleaning Approach is treeClasifier - Test Data")
+            #print("Cleaning Approach is treeClasifier - Test Data")
             X_test = self.reg_test_df
             #df_train_features = reg_train_df.drop(['RUL'], axis=1)
         else:
@@ -326,7 +323,7 @@ class MLPredictions:
         #df_solution['id'] = dataset_test.id
         #df_solution['RUL'] = dataset_test.RUL
         
-        print("called test_model")
+        #print("called test_model")
         # Starting time for time calculations
         start_time = time.time()
         #ExtraTreeClasifier -- revmonig s6
@@ -338,7 +335,7 @@ class MLPredictions:
         
         predictions = self.algo_instant.predict(X_test)
         # predictions_day = algo_instant.predict(X_Day_TEST)
-        print("The time taken to execute is %s seconds" % (time.time() - start_time))
+        #print("The time taken to execute is %s seconds" % (time.time() - start_time))
     
         # Prepare Solution dataframe
         
@@ -351,14 +348,14 @@ class MLPredictions:
         #list_days = pd.DataFrame()        
         plt.plot(list(df_solution['Engine_ID']), predictions, color='lightblue')    
         csvName = str("./server/Output/") + aName + str("_") + cleanApproach + str("_Predicted.csv")
-        print(csvName)
+        #print(csvName)
         #df_solution.to_csv('../Dataset/predicted.csv', encoding='utf-8',index = None)
         truth_data = pd.read_csv('./server/Dataset/PM_truth.txt', sep=" ", header=None)
         truth_data = truth_data.drop(truth_data.columns[[1]], axis=1)
         truth_data.columns = ['Actual_RUL']
         truth_data['Engine_ID'] = truth_data.index + 1
         #truth_data['max'] = rul['max'] + truth_df['more']
-        print("LK Mishra")
+        #print("LK Mishra")
         #print(truth_data)
         df_solution = df_solution.merge(truth_data, on=['Engine_ID'], how='left')
         df_solution.to_csv(csvName, encoding='utf-8',index = None)
@@ -375,25 +372,20 @@ class MLPredictions:
 
 
     def test_stream_data(self,aName, cleanApproach,test_dataframe):
-        if cleanApproach == "PCA":
-            print("Cleaning Approach is PCA - Test Data")
-            test_dataframe = test_dataframe.drop(['id','cycle','id','s7','s8','s9','s11', 's12','s13','s14','s15','s17','s20','s21'], axis=1)
-            X_test = test_dataframe
+        if cleanApproach == "PCA":            
+            test_dataframe1 = test_dataframe.drop(['id','cycle','id','s7','s8','s9','s11', 's12','s13','s14','s15','s17','s20','s21'], axis=1)
+            X_test = test_dataframe1
         elif cleanApproach == "treeClasifier":
-            print("Cleaning Approach is treeClasifier - Test Data")
             X_test = test_dataframe
         else:
             print("Invalid Clean approach")
             
         df_solution = pd.DataFrame()
         
-        print("called test_model")
         # Starting time for time calculations
         start_time = time.time()
         
         predictions = self.algo_instant.predict(X_test)
-        # predictions_day = algo_instant.predict(X_Day_TEST)
-        print("The time taken to execute is %s seconds" % (time.time() - start_time))
     
         # Prepare Solution dataframe    
         df_solution['Engine_ID'] = test_dataframe.id
@@ -457,29 +449,36 @@ class MLPredictions:
 
 
     def preprocess_data_frame_stream(self,tf_dataframe):
-        tf_dataframe.drop(self.tf_dataframe.columns[[26, 27]], axis=1, inplace=True)
+        #print(tf_dataframe)
+        #tf_dataframe.drop(tf_dataframe.columns[[26]], axis=1, inplace=True)
         tf_dataframe.columns = ['id', 'cycle', 'setting1', 'setting2', 'setting3', 's1', 's2', 's3',
                              's4', 's5', 's6', 's7', 's8', 's9', 's10', 's11', 's12', 's13', 's14',
                              's15', 's16', 's17', 's18', 's19', 's20', 's21']
 
 
         tf_dataframe['cycle_norm'] = tf_dataframe['cycle']
-        norm_test_df = pd.DataFrame(min_max_scaler.transform(self.tf_dataframe[cols_normalize]), 
+        cols_normalize = tf_dataframe.columns.difference(['id','cycle','RUL','label1','label2'])
+        self.min_max_scaler = preprocessing.MinMaxScaler()
+        norm_test_df = pd.DataFrame(self.min_max_scaler.fit_transform(tf_dataframe[cols_normalize]), 
                                     columns=cols_normalize, 
                                     index=tf_dataframe.index)
-        test_join_df = tf_dataframe[self.tf_dataframe.columns.difference(cols_normalize)].join(norm_test_df)
-        tf_dataframe = test_join_df.reindex(columns = self.test_df.columns)
+        test_join_df = tf_dataframe[tf_dataframe.columns.difference(cols_normalize)].join(norm_test_df)
+        tf_dataframe = test_join_df.reindex(columns = tf_dataframe.columns)
         tf_dataframe = tf_dataframe.reset_index(drop=True)
         tf_dataframe = tf_dataframe.drop(['setting3', 's1', 's5', 's10', 's16', 's18', 's19'], axis=1)
-        tf_dataframe = tf_dataframe.drop(['RUL','label1', 'label2'], axis=1)
+        #tf_dataframe = tf_dataframe.drop(['RUL','label1', 'label2'], axis=1)
+        return tf_dataframe
 
 
     def start_testing_on_stream(self,tf_dataframe):
-        process_tf_dataframe = self.preprocess_data_frame_stream(self,tf_dataframe)
+        process_tf_dataframe = self.preprocess_data_frame_stream(tf_dataframe)
+
+        self.general_data_processing(self.w1,self.w0)    
+        self.data_processing_regression()
 
         try:  
             self.train_regression_model(self.algoName, self.approach)        
-            df_solution = self.test_stream_data(self.algoName, self.approach,)        
+            df_solution = self.test_stream_data(self.algoName, self.approach,process_tf_dataframe)        
             jsonObject = {}            
             jsonObject["engine_id"] = df_solution['Engine_ID'].values.tolist()
             jsonObject["predicted_rul"] = df_solution['Predicted_RUL'].values.tolist()    

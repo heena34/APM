@@ -27,7 +27,7 @@ class Live_Streaming:
     def trainOnAlgoName(self,algo_name,approach,w1,w0,selected_frame):
         mp_exe = MLPredictions(algo_name,approach,w1,w0)
         result = mp_exe.start_testing_on_stream(selected_frame)
-        return selected_frame
+        return result
 
 
         
@@ -37,19 +37,20 @@ class Live_Streaming:
             number_of_records = self.frame_length
 
 
-        selected_data_frame = pd.read_csv('Output/live.csv',nrows=number_of_records)
+        selected_data_frame = pd.read_csv('./server/Output/live.txt',sep=" ",header=None,nrows=number_of_records)
         result_one = self.pool.apply_async(self.trainOnAlgoName,("LinearRegression","PCA",w1,w0,selected_data_frame))
-        print(result_one.get())
+        
+        #result_two = self.pool.apply_async(self.trainOnAlgoName,("LinearDiscriminantAnalysis","PCA",w1,w0,selected_data_frame))
+        #print(result_two.get())
 
-        result_two = self.pool.apply_async(self.trainOnAlgoName,("LinearDiscriminantAnalysis","PCA",w1,w0,selected_data_frame))
-        print(result_two.get())
-
-        result_three = self.pool.apply_async(self.trainOnAlgoName,("DecisionTreeRegressor","PCA",w1,w0,selected_data_frame))
-        print(result_three.get())
+        #result_three = self.pool.apply_async(self.trainOnAlgoName,("DecisionTreeRegressor","PCA",w1,w0,selected_data_frame))
+        #print(result_three.get())
 
 
-        result_four = self.pool.apply_async(self.trainOnAlgoName,("LogisticRegression","PCA",w1,w0,selected_data_frame))
-        print(result_four.get())
+        #result_four = self.pool.apply_async(self.trainOnAlgoName,("LogisticRegression","PCA",w1,w0,selected_data_frame))
+        #print(result_four.get())
 
-        result_five = self.pool.apply_async(self.trainOnAlgoName,("KNeighborsClassifier","PCA",w1,w0,selected_data_frame))
-        print(result_five.get())
+        #result_five = self.pool.apply_async(self.trainOnAlgoName,("KNeighborsClassifier","PCA",w1,w0,selected_data_frame))
+        #print(result_five.get())
+
+        return result_one.get()

@@ -37,18 +37,32 @@ while i < total_cycles:
 
     print("Printing  - LIVE SENSOR DATA")
     #data.head()
-    data = pd.read_csv('Dataset/PM_test.csv', sep=" ", header=None) 
+    data = pd.read_csv('Dataset/PM_test.csv',sep=" ",header=None) 
 
     #print(data.head(i))
     print(data.ix[i])
-    data = data.ix[i]
-    data.to_csv('Output/live.csv', encoding='utf-8',index = None)
+    next_data = data.iloc[i]
+    next_data.to_csv('Output/live.txt', encoding='utf-8',index = None)
+    file = open('Output/live.txt')
+    contents = file.read()
+    replaced_contents = contents.replace(',', ' ')
+    replaced_contents = replaced_contents.replace('"','')
+
+    #replaced_contents.to_csv('../Output/live.txt', encoding='utf-8',index = None)
+    print(replaced_contents)
+
+    text_file = open("Output/live.txt", "w")
+
+    text_file.write(replaced_contents)
+
+    text_file.close()
+
     print("Engine Working ..................................")
     time.sleep(5)
     print("Engine just Woke up and Provided data ...........")
     print("\n")
     print("\n")
-    dataFromLive = pd.read_csv('Output/live.csv', sep=" ", header=None)
+    dataFromLive = pd.read_csv('Output/live.txt', sep=" ", header=None)
     print("showing data from live sheet")
     print(dataFromLive)
 
