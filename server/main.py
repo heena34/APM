@@ -35,7 +35,7 @@ bin_executor = BinaryClassification()
 if path not in sys.path:
     sys.path.append(path)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="www")
 
 
 generated_graphs = {
@@ -48,6 +48,26 @@ generated_graphs = {
   6:'../APM/Output/model_regression_loss.png',
   7:'../APM/Output/model_verify.png'
 }
+
+
+
+@app.route('/')
+def root():
+    return app.send_static_file('index.html')
+
+
+@app.route('/<path:path>')
+def send_js(path):
+    if ".js" in path:
+        return app.send_static_file(path)
+    if ".css" in path:
+        return app.send_static_file(path)
+    if ".png" in path:
+        return app.send_static_file(path)
+    if "ttf" in path:
+        return app.send_static_file(path)
+    else:
+        return app.send_static_file('index.html')
 
 @app.route("/graph/<int:key>/")
 def get_image(key):
